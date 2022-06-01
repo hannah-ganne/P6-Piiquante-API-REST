@@ -27,6 +27,7 @@ exports.createSauce = (req, res, next) => {
     delete sauceObject._id;
     const sauce = new Sauce({
         ...sauceObject,
+        userId: req.token.userId,
         likes: 0,
         dislikes: 0,
         usersLiked: [],
@@ -50,7 +51,7 @@ exports.modifySauce = (req, res, next) => {
                 error: new Error('Sauce non trouvée !')
             })
         }
-        if (sauce.userId !== req.auth.userId) {
+        if (sauce.userId !== req.token.userId) {
             return res.status(403).json({
                 error: new Error('Requête non autorisée !')
             })
@@ -64,10 +65,11 @@ exports.modifySauce = (req, res, next) => {
 
             sauceObject = {
                 ...JSON.parse(req.body.sauce),
+                userId: req.token.userId,
                 imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             }
         } else {
-            sauceObject = { ...req.body }
+            sauceObject = { ...req.body, userId: req.token.userId}
         }
 
         Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
@@ -88,7 +90,7 @@ exports.deleteSauce = (req, res, next) => {
                 error: new Error('Sauce non trouvée !')
             })
         }
-        if (sauce.userId !== req.auth.userId) {
+        if (sauce.userId !== req.token.userId) {
             return res.status(403).json({
                 error: new Error('Requête non autorisée !')
             })
