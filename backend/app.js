@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const path = require('path');
 
 const sauceRoutes = require('./routes/sauce');
@@ -9,6 +10,14 @@ const userRoutes = require('./routes/user');
 const app = express();
 
 app.use(express.json());
+
+/**
+ * allow frontend and backend using different ports
+ */
+app.use(helmet({ 
+    crossOriginResourcePolicy: false 
+    })
+);
 
 mongoose.connect('mongodb+srv://hannahganne:PppVVsyLxgs6rZAI@cluster0.vkddx.mongodb.net/?retryWrites=true&w=majority',
 { useNewUrlParser: true,
