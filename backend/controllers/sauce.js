@@ -113,7 +113,7 @@ exports.likeSauce = (req, res, next) => {
     .then(sauce => {
         const usersLiked = sauce.usersLiked;
         const usersDisliked = sauce.usersDisliked;
-        const userId = req.body.userId;
+        const userId = req.token.userId;
 
         switch (req.body.like) {
             case 1:
