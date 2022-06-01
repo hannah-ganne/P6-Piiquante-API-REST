@@ -104,7 +104,7 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 /**
- * 
+ * Like/dislike, or undo like/dislike a sauce
  */
 exports.likeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
