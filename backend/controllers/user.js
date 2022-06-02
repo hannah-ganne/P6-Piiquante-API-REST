@@ -1,12 +1,14 @@
+const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const passwordValidator = require('password-validator');
+const rateLimit = require('express-rate-limit');
+const app = express();
 
 /**
  * validate if password conditions are met
  */
-const passwordValidator = require('password-validator');
-
 const passwordSchema = new passwordValidator();
 
 passwordSchema
@@ -14,6 +16,18 @@ passwordSchema
 .has().uppercase()
 .has().lowercase()
 .has().digits(3)
+
+/**
+ * 
+ * limit signup and login attempts per IP
+ */
+const createAccountLimiter = rateLimit({
+        windowMs: 10 * 60 * 1000,
+        max: 5,
+        message: 'Trop de comptes créés à partir de cette IP, veuillez réessayer dans 10 minutes.'
+})
+
+
 
 /**
  * user sign up
