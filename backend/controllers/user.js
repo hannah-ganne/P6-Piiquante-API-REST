@@ -2,20 +2,18 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const CryptoJS = require('crypto-js');
+const crypto = require('../utils/crypto');
+
 
 /**
  * user sign up
  */
 exports.signup = (req, res, next) => {
-    const key = CryptoJS.enc.Utf8.parse(process.env.CRYPTOJS_SECRET_KEY);
-    const iv = CryptoJS.enc.Utf8.parse(process.env.CRYPTOJS_IV);
-    const encryptedEmail = CryptoJS.AES.encrypt(req.body.email, key, { iv : iv })
 
     bcrypt.hash(req.body.password, 10)
     .then(hash => {
         const user = new User({
-        email: encryptedEmail,
+        email: crypto.AES(req),
         password: hash
         });
         user.save()
@@ -30,11 +28,7 @@ exports.signup = (req, res, next) => {
  */
 exports.login = (req, res, next) => {
 
-    const key = CryptoJS.enc.Utf8.parse(process.env.CRYPTOJS_SECRET_KEY);
-    const iv = CryptoJS.enc.Utf8.parse(process.env.CRYPTOJS_IV);
-    const encryptedEmail = CryptoJS.AES.encrypt(req.body.email, key, { iv : iv })
-
-    User.findOne({ email: encryptedEmail.toString() })
+    User.findOne({ email: crypto.AES(req).toString() })
         .then(user => {
         if (!user) {
             return res.status(401).json({ error: 'Utilisateur non trouvé !' });
