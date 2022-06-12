@@ -19,7 +19,7 @@ app.use(helmet({
     })
 );
 
-mongoose.connect('mongodb+srv://hannahganne:PppVVsyLxgs6rZAI@cluster0.vkddx.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${process.env.MONGODB_ID}:${process.env.MONGODB_PW}@cluster0.vkddx.mongodb.net/?retryWrites=true&w=majority`,
 { useNewUrlParser: true,
     useUnifiedTopology: true })
 .then(() => console.log('Connexion à MongoDB réussie !'))
