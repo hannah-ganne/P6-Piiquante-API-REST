@@ -43,11 +43,10 @@ exports.createPost = (req, res, next) => {
 
     // create a post
     const postObject = req.body;
-    // delete postObject._id;
+    delete postObject.id;
     const post = {
         ...postObject,
-        // userId: req.token.userId, it doesn't work!
-        userId: req.body.userId,
+        userId: req.token.userId,
         likes: 0,
         dislikes: 0,
         usersLiked: [],
@@ -98,7 +97,7 @@ exports.modifyPost = (req, res, next) => {
 
         Post.update( postObject, { where: { id: id }})
         .then(post => res.status(200).json({ message: 'Post modified'}))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ message: "There's an " + error }));
     })
     .catch(error => res.status(500).json({ message: "There's an " + error }));
 };
@@ -121,9 +120,9 @@ exports.deletePost = (req, res, next) => {
                 error: new Error('Request not authorized')
             })
         }
-        const filename = sauce.imageUrl.split('/images/')[1];
+        const filename = post.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
-            Post.deleteOne({ where: { id: id } })
+            Post.destroy({ where: { id: id } })
             .then(() => res.status(200).json({ message: 'Post deleted'}))
             .catch(error => res.status(400).json({ error }));
         });
@@ -134,6 +133,43 @@ exports.deletePost = (req, res, next) => {
 /**
  * Like/dislike, or undo like/dislike a post
  */
+// exports.likePost = (req, res, next) => {
+//     const id = req.params.id;
+
+//     Post.findByPk(id)
+//     .then(post => {
+//         const usersLiked = post.usersLiked;
+//         const usersDisliked = post.usersDisliked;
+//         const userId = req.token.userId;
+
+//         switch (req.body.like) {
+//             case 1:
+//                 if (!usersLiked.includes(userId) && !usersDisliked.includes(userId)) {
+//                     usersLiked.push(userId);
+//                 }
+//                 break;
+//             case -1:
+//                 if (!usersDisliked.includes(userId) && !usersLiked.includes(userId)) {
+//                     usersDisliked.push(userId);
+//                 }
+//                 break;
+//             case 0:
+//                 if (usersLiked.includes(userId)) {
+//                     usersLiked.remove(userId)}
+//                     else if (usersDisliked.includes(userId)){
+//                         usersDisliked.remove(userId)
+//                     }
+//                 break;
+//         }
+//         post.likes = post.usersLiked.length;
+//         post.dislikes = post.usersDisliked.length;
+//         post.save()
+//             .then(() => res.status(201).json({ message: 'Post rated'}))
+//             .catch(error => res.status(400).json({ error }));
+//     })
+//     .catch(error => res.status(500).json({ message: "There's an " + error }));
+// }
+
 exports.likePost = (req, res, next) => {
     const id = req.params.id;
 
@@ -141,18 +177,21 @@ exports.likePost = (req, res, next) => {
     .then(post => {
         const usersLiked = post.usersLiked;
         const usersDisliked = post.usersDisliked;
-        const userId = req.body.userId;
-        // const userId = req.token.userId;
+        const userId = req.token.userId;
 
         switch (req.body.like) {
             case 1:
                 if (!usersLiked.includes(userId) && !usersDisliked.includes(userId)) {
-                    usersLiked.push(userId);
+                    Post.update({ usersLiked: [...usersLiked, userId]}, {
+                        where: { id: id }
+                    })
                 }
                 break;
             case -1:
                 if (!usersDisliked.includes(userId) && !usersLiked.includes(userId)) {
-                    usersDisliked.push(userId);
+                    Post.update({ usersDisliked: [...usersDisliked, userId]}, {
+                        where: { id: id }
+                    })
                 }
                 break;
             case 0:

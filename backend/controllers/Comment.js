@@ -10,12 +10,12 @@ exports.getAllComments = (req, res, next) => {
 };
 
 /**
- * Leave a new comment
+ * Leave a new comment 
  */
 exports.createComment = (req, res, next) => {
     // create a comment
     const commentObject = JSON.parse(req.body.comment);
-    delete commentObject._id;
+    delete commentObject.id;
     const comment = {
         ...postObject,
         userId: req.token.userId,
