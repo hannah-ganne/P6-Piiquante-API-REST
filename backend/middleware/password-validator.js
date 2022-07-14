@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
         next();
     } else {
         return res.status(401).json({
-            error: `Your password do not meet the following conditions: ${passwordSchema.validate(req.body.password, { list: true })}`
+            error: `Le mot de passe ne remplit pas les conditions: ${passwordSchema.validate(req.body.password, { list: true })}`
         })
     }
 }

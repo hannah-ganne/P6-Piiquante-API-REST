@@ -5,7 +5,7 @@ const loginLimiter = rateLimit({
     max: 10,
     standardHeaders: true,
     legacyHeaders: false,
-    message: "Too many login attemps have been made from this IP. Try again in an hour."
+    message: "Trop de tentatives de connexion ont été effectuées à partir de cette IP, veuillez réessayer dans une heure"
 })
 
 module.exports = { loginLimiter }

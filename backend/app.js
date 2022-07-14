@@ -1,19 +1,15 @@
 const express = require('express');
-const cors = require('cors');
-const db = require('./config/database');
+const mongoose = require('mongoose');
 const helmet = require('helmet');
 const path = require('path');
 
-const postRoutes = require('./routes/post.js');
-const userRoutes = require('./routes/user.js');
-const commentRoutes = require('./routes/comment.js')
+const sauceRoutes = require('./routes/sauce');
+const userRoutes = require('./routes/user');
 
 
 const app = express();
 
 app.use(express.json());
-
-app.use(cors());
 
 /**
  * allow frontend and backend using different ports
@@ -23,6 +19,12 @@ app.use(helmet({
     })
 );
 
+mongoose.connect(`mongodb+srv://${process.env.MONGODB_ID}:${process.env.MONGODB_PW}@cluster0.vkddx.mongodb.net/?retryWrites=true&w=majority`,
+{ useNewUrlParser: true,
+    useUnifiedTopology: true })
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch(() => console.log('Connexion à MongoDB échouée !'));
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -30,17 +32,8 @@ app.use((req, res, next) => {
     next();
 });
 
-//testing database connection
-// try {
-//     await db.authenticate();
-//     console.log('Connection has been established successfully.');
-//     } catch (error) {
-//     console.error('Unable to connect to the database:', error);
-//     }
-
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use('/api/posts', postRoutes);
+app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
-app.use('/api/comments', commentRoutes);
 
 module.exports = app;
